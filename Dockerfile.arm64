@@ -1,0 +1,23 @@
+FROM arm64v8/ubuntu:latest
+
+# Install necessary packages
+RUN apt-get update && apt-get install -y openjdk-11-jdk
+
+# Set environment variables (adjust as needed)
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-arm64
+ENV PATH $PATH:$JAVA_HOME/bin
+
+RUN apt-get install wget -y
+
+# Set up jenkins user
+RUN useradd -ms /bin/bash jenkins
+USER jenkins
+WORKDIR /home/jenkins
+
+RUN wget -O agent.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/4.11/remoting-4.11.jar
+
+# Download agent.jar
+
+
+# Entry point (for example, you can start the Jenkins agent here)
+ENTRYPOINT ["/usr/bin/java", "-jar", "/home/jenkins/agent.jar"]

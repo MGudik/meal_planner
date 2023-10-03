@@ -1,0 +1,1 @@
+docker buildx build --platform arm64 --output "type=docker,push=false,name=mgudik/aarch64:latest" .
