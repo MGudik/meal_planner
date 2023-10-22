@@ -1,5 +1,8 @@
-import 'package:foodplan/models/food.dart';
+import 'package:meal_planner/models/food.dart';
 import "package:string_extension/string_extension.dart";
+import 'package:uuid/uuid.dart';
+
+const uuid = Uuid();
 
 enum WeekDay {
   monday,
@@ -15,8 +18,9 @@ enum WeekDay {
 }
 
 class Week {
-  Week();
+  Week() : id = uuid.v4();
 
+  final String id;
   Map<WeekDay, Food?> plan = {};
 
   Week addFood(Food food, WeekDay day) {
