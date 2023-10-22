@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meal_planner/models/week.dart';
+import 'package:meal_planner/providers/plan_provider.dart';
 import 'package:meal_planner/screens/add_wish.dart';
 import 'package:meal_planner/widgets/week_day.dart';
+import 'package:riverpod/riverpod.dart';
 
-class MainScreen extends StatelessWidget {
+class MainScreen extends ConsumerWidget {
   const MainScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.read(mealPlanProvider.notifier).getMealPlan();
 
     return Scaffold(
       appBar: AppBar(
@@ -28,8 +32,7 @@ class MainScreen extends StatelessWidget {
         child: Column(
           children: [
             for (final (index, day) in WeekDay.values.indexed)
-              WeekDayWidget(
-                  key: ValueKey(index), day: day)
+              WeekDayWidget(key: ValueKey(index), day: day)
           ],
         ),
       ),

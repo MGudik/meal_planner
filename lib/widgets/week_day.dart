@@ -19,9 +19,7 @@ class WeekDayWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print("Render..");
     final mealPlan = ref.watch(mealPlanProvider);
-    final wish = ref.watch(wishProvider);
     String content;
     if (mealPlan[day] == null) {
       content = "No Meal is planned for that day";
