@@ -1,12 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meal_planner/models/food.dart';
 import 'package:meal_planner/providers/wish_provider.dart';
+import 'package:http/http.dart' as http;
 
 class WishList extends ConsumerWidget {
-  const WishList({super.key});
+  const WishList({super.key, required this.onTap});
+
+  final void Function(Food meal) onTap;
+
+  void _removeWish(Food meal, WidgetRef ref) async {
+    final url = Uri.https('flutter-prep-37902-default-rtdb.firebaseio.com',
+        'wish-list/${meal.id}.json');
+
+    final response = await http.delete(url);
+    if (response.statusCode >= 400) {
+      return;
+    }
+    ref.read(wishProvider.notifier).removeWish(meal);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.read(wishProvider.notifier).getWishList();
     final wishes = ref.watch(wishProvider);
     return Container(
       decoration: BoxDecoration(
@@ -28,7 +44,8 @@ class WishList extends ConsumerWidget {
               itemBuilder: (context, index) {
                 return ListTile(
                   onTap: () {
-                    ref.read(wishProvider.notifier).removeWish(wishes[index]);
+                    onTap(wishes[index]);
+                    _removeWish(wishes[index], ref);
                   },
                   title: Text(wishes[index].title),
                   leading: const Icon(Icons.star),

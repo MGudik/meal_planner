@@ -28,7 +28,6 @@ class AddWishScreen extends ConsumerWidget {
     }
     final meal = Food.withID(
         id: json.decode(response.body)["name"], title: enteredTitle);
-    print(meal.id);
     ref.read(wishProvider.notifier).makeWish(meal);
 
     Navigator.of(context).pop();
@@ -51,15 +50,18 @@ class AddWishScreen extends ConsumerWidget {
             const SizedBox(
               height: 16,
             ),
-            TextButton.icon(
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.onBackground,
+                foregroundColor: Theme.of(context).colorScheme.background,
+              ),
               onPressed: () => _makeWish(context, ref),
               icon: const Icon(Icons.star),
               label: const Text('Make a Wish!'),
             ),
             const SizedBox(
               height: 16,
-            ),
-            const Expanded(child: WishList()),
+            )
           ]),
         ),
       ),

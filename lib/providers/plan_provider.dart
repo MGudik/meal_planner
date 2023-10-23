@@ -22,7 +22,7 @@ class MealPlanNotifier extends StateNotifier<Map<WeekDay, Food?>> {
   }
 
   void removeMeal(WeekDay day) {
-    state = state;
+    state = {...state, day: null};
   }
 
   void getMealPlan() async {

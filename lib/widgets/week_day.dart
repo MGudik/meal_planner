@@ -1,15 +1,29 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meal_planner/models/food.dart';
 import 'package:meal_planner/models/week.dart';
 import 'package:meal_planner/providers/plan_provider.dart';
-import 'package:meal_planner/providers/wish_provider.dart';
+import 'package:http/http.dart' as http;
 import 'package:meal_planner/screens/add_food.dart';
 
 class WeekDayWidget extends ConsumerWidget {
-  const WeekDayWidget({super.key, required this.day});
+  WeekDayWidget({super.key, required this.day});
 
   final WeekDay day;
+  static const planId = "-NhNoO5bOJwpboPYAyW3";
+  final url = Uri.https('flutter-prep-37902-default-rtdb.firebaseio.com',
+      'meal-plan/$planId.json');
+
+  void _clearDay(WidgetRef ref) async {
+    final response =
+        await http.patch(url, body: json.encode({day.toString(): null}));
+    if (response.statusCode >= 400) {
+      return;
+    }
+    ref.read(mealPlanProvider.notifier).removeMeal(day);
+  }
 
   void _addFood(BuildContext context, Food? meal) {
     Navigator.of(context).push(MaterialPageRoute(
@@ -22,7 +36,7 @@ class WeekDayWidget extends ConsumerWidget {
     final mealPlan = ref.watch(mealPlanProvider);
     String content;
     if (mealPlan[day] == null) {
-      content = "No Meal is planned for that day";
+      content = "Click to add a meal...";
     } else {
       content = mealPlan[day]!.title;
     }
@@ -47,7 +61,18 @@ class WeekDayWidget extends ConsumerWidget {
                                 .onBackground
                                 .withOpacity(0.2),
                           ),
-                    )
+                    ),
+                    const Spacer(),
+                    mealPlan[day] == null
+                        ? const Spacer()
+                        : InkWell(
+                            onTap: () => _clearDay(ref),
+                            child: Icon(Icons.delete,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onBackground
+                                    .withOpacity(0.2)),
+                          ),
                   ],
                 ),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
