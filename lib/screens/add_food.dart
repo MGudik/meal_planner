@@ -46,13 +46,6 @@ class AddFoodScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text('Meal for ${day.toString()}'),
       ),
-      floatingActionButton: FloatingActionButton.small(
-          child: const Icon(Icons.star),
-          onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => AddWishScreen(),
-            ));
-          }),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Form(

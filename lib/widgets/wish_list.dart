@@ -9,6 +9,7 @@ class WishList extends ConsumerWidget {
 
   final void Function(Food meal) onTap;
 
+
   void _removeWish(Food meal, WidgetRef ref) async {
     final url = Uri.https('flutter-prep-37902-default-rtdb.firebaseio.com',
         'wish-list/${meal.id}.json');
@@ -34,9 +35,16 @@ class WishList extends ConsumerWidget {
               Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1)),
       child: Column(
         children: [
-          Text(
-            "Wish List",
-            style: Theme.of(context).textTheme.titleLarge,
+          Row(
+            children: [
+              const Spacer(),
+              Text(
+                "Wish List",
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const Spacer(),
+              Padding(padding: const EdgeInsets.all(16), child: Icon(Icons.add_box_rounded, size: 32, color: Theme.of(context).colorScheme.onBackground.withOpacity(0.5),))
+            ],
           ),
           Expanded(
             child: ListView.builder(
