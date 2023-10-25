@@ -1,11 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meal_planner/models/food.dart';
 import 'package:meal_planner/providers/wish_provider.dart';
-import 'package:meal_planner/widgets/wish_list.dart';
-import 'package:http/http.dart' as http;
+import 'package:meal_planner/utilities/http.dart' as http;
 
 class AddWishScreen extends ConsumerWidget {
   AddWishScreen({super.key});
@@ -19,18 +16,14 @@ class AddWishScreen extends ConsumerWidget {
       return;
     }
 
-    final url = Uri.https(
-        'flutter-prep-37902-default-rtdb.firebaseio.com', 'wish-list.json');
-    final response =
-        await http.post(url, body: json.encode({"title": enteredTitle}));
-    if (response.statusCode >= 400) {
-      return;
+    final response = await http.addWish(enteredTitle);
+    if (response != null) {
+      final wish = Wish(id: response, title: enteredTitle);
+      ref.read(wishProvider.notifier).makeWish(wish);
     }
-    final meal = Food.withID(
-        id: json.decode(response.body)["name"], title: enteredTitle);
-    ref.read(wishProvider.notifier).makeWish(meal);
-
-    Navigator.of(context).pop();
+    if (context.mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override

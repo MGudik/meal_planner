@@ -2,23 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meal_planner/models/food.dart';
 import 'package:meal_planner/providers/wish_provider.dart';
-import 'package:http/http.dart' as http;
+import 'package:meal_planner/screens/add_wish.dart';
+import 'package:meal_planner/utilities/http.dart' as http;
 
 class WishList extends ConsumerWidget {
   const WishList({super.key, required this.onTap});
 
-  final void Function(Food meal) onTap;
+  final void Function(Wish wish) onTap;
 
-
-  void _removeWish(Food meal, WidgetRef ref) async {
-    final url = Uri.https('flutter-prep-37902-default-rtdb.firebaseio.com',
-        'wish-list/${meal.id}.json');
-
-    final response = await http.delete(url);
-    if (response.statusCode >= 400) {
-      return;
-    }
-    ref.read(wishProvider.notifier).removeWish(meal);
+  void _removeWish(Wish wish, WidgetRef ref) async {
+    http.removeWish(wish);
+    ref.read(wishProvider.notifier).removeWish(wish);
   }
 
   @override
@@ -43,7 +37,20 @@ class WishList extends ConsumerWidget {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const Spacer(),
-              Padding(padding: const EdgeInsets.all(16), child: Icon(Icons.add_box_rounded, size: 32, color: Theme.of(context).colorScheme.onBackground.withOpacity(0.5),))
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => AddWishScreen()));
+                },
+                child: Icon(
+                  Icons.add_box_rounded,
+                  size: 32,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onBackground
+                      .withOpacity(0.5),
+                ),
+              )
             ],
           ),
           Expanded(
@@ -55,7 +62,7 @@ class WishList extends ConsumerWidget {
                     onTap(wishes[index]);
                     _removeWish(wishes[index], ref);
                   },
-                  title: Text(wishes[index].title),
+                  title: Column(children: [Text(wishes[index].title), Text("Wished by " + wishes[index].wishedBy, style: Theme.of(context).textTheme.bodySmall!.copyWith(color: const Color.fromRGBO(255, 255, 255, 0.2)),) ]),
                   leading: const Icon(Icons.star),
                 );
               },

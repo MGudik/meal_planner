@@ -1,27 +1,18 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meal_planner/models/food.dart';
 import 'package:meal_planner/models/week.dart';
 import 'package:meal_planner/providers/plan_provider.dart';
-import 'package:http/http.dart' as http;
+import 'package:meal_planner/utilities/http.dart' as http;
 import 'package:meal_planner/screens/add_food.dart';
 
 class WeekDayWidget extends ConsumerWidget {
-  WeekDayWidget({super.key, required this.day});
+  const WeekDayWidget({super.key, required this.day});
 
   final WeekDay day;
-  static const planId = "-NhNoO5bOJwpboPYAyW3";
-  final url = Uri.https('flutter-prep-37902-default-rtdb.firebaseio.com',
-      'meal-plan/$planId.json');
 
   void _clearDay(WidgetRef ref) async {
-    final response =
-        await http.patch(url, body: json.encode({day.toString(): null}));
-    if (response.statusCode >= 400) {
-      return;
-    }
+    http.removeDay(day);
     ref.read(mealPlanProvider.notifier).removeMeal(day);
   }
 
