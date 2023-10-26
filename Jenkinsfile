@@ -13,15 +13,13 @@ pipeline {
     stages {
         stage('Setup & Configure') {
             steps {
-                sh "flutter channel stable"
-                sh "flutter upgrade"
-                sh "flutter config --enable-linux-desktop"
                 sh "flutter doctor"
             }
         }
         stage('Compile to Linux') {
 		   steps {
-            sh "flutter build linux"
+            sh "flutter build linux -v --release"
+            sh "flutter build apk -v --release"
             } 
 		}
         stage('Create image') {
