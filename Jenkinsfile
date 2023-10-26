@@ -11,8 +11,12 @@ pipeline {
         pollSCM('')
     }
     stages {
-        stage('Setup & Configure') {
+        stage('Setup & Configure Flutter') {
             steps {
+                sh "flutter channel stable"
+                sh "flutter upgrade"
+                sh "flutter config --enable-linux-desktop"
+                sh "flutter config --enable-android"
                 sh "flutter doctor"
             }
         }
