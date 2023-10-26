@@ -5,7 +5,6 @@ import 'package:meal_planner/providers/plan_provider.dart';
 import 'package:meal_planner/providers/wish_provider.dart';
 import 'package:meal_planner/screens/add_wish.dart';
 import 'package:meal_planner/widgets/week_day.dart';
-import 'package:riverpod/riverpod.dart';
 
 class MainScreen extends ConsumerWidget {
   const MainScreen({super.key});
