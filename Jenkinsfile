@@ -19,6 +19,10 @@ pipeline {
         stage('Compile to Linux') {
 		   steps {
             sh "flutter build linux -v --release"
+            } 
+		}
+        stage('Compile to Android') {
+		   steps {
             sh "flutter build apk -v --release"
             } 
 		}
@@ -30,7 +34,7 @@ pipeline {
     }
     post {
         success {
-            archiveArtifacts artifacts: 'build/linux/x64/release/release-x64.tar.gz',
+            archiveArtifacts artifacts: 'build/linux/x64/release/release-x64.tar.gz, build/app/outputs/flutter-apk/app-release.apk',
                                 allowEmptyArchive: false,
                                 caseSensitive: true,
                                 fingerprint: false,
