@@ -24,26 +24,14 @@ pipeline {
                 sh "flutter doctor"
             }
         }
-        stage('Check toolchain') {
-            steps {
-            }
-        }
-		stage('Install build dependencies') {
-		   steps {
-		    }
-		}
-        stage('Prepare Python environment') {
-		   steps {
-		    }
-		}
         stage('Compile to Linux') {
 		   steps {
             sh "flutter build linux"
-            sh "cd build/linux/x64/release && tar -czvf release-x64.tar.gz bundle"
             } 
 		}
         stage('Create image') {
 		   steps {
+                sh "cd build/linux/x64/release && tar -czvf release-x64.tar.gz bundle"
 		    }
 		}
     }
