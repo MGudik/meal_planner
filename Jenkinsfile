@@ -7,13 +7,8 @@ pipeline {
         disableConcurrentBuilds()
         buildDiscarder(logRotator(numToKeepStr: '3', daysToKeepStr: '3', artifactNumToKeepStr: '3', artifactDaysToKeepStr: '3'))
     }
-    parameters {
-    }
     triggers {
         pollSCM('')
-    }
-    environment {
-
     }
     stages {
         stage('Setup & Configure') {
