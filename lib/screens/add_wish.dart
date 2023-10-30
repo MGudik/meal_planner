@@ -18,7 +18,8 @@ class AddWishScreen extends ConsumerWidget {
 
     final response = await http.addWish(enteredTitle);
     if (response != null) {
-      final wish = Wish(id: response, title: enteredTitle);
+      final wish =
+          Wish(id: response, title: enteredTitle, wishedBy: "Gudiksen");
       ref.read(wishProvider.notifier).makeWish(wish);
     }
     if (context.mounted) {

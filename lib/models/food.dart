@@ -12,9 +12,9 @@ class Food {
 }
 
 class Wish {
-  Wish({required this.id, required this.title});
+  Wish({required this.id, required this.title, required this.wishedBy});
 
   final String id;
   final String title;
-  String wishedBy = "Gudiksen";
+  String wishedBy = "";
 }

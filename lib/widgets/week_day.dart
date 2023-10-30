@@ -16,10 +16,22 @@ class WeekDayWidget extends ConsumerWidget {
     ref.read(mealPlanProvider.notifier).removeMeal(day);
   }
 
-  void _addFood(BuildContext context, Food? meal) {
-    Navigator.of(context).push(MaterialPageRoute(
+  void _addFood(BuildContext context, Food? meal, WidgetRef ref) async {
+    final title = await Navigator.of(context).push(MaterialPageRoute<String>(
       builder: (context) => AddFoodScreen(day: day, meal: meal),
     ));
+    if (title == null) {
+      return;
+    }
+    String enteredTitle = title.trim();
+
+    if (enteredTitle.length <= 1) {
+      return;
+    }
+
+    http.updateDay(enteredTitle, day);
+    final newMeal = Food(title: enteredTitle);
+    ref.read(mealPlanProvider.notifier).setMeal(newMeal, day);
   }
 
   @override
@@ -33,8 +45,13 @@ class WeekDayWidget extends ConsumerWidget {
     }
 
     return InkWell(
-      onTap: () => _addFood(context, mealPlan[day]),
+      onTap: () => _addFood(context, mealPlan[day], ref),
       child: Card(
+        elevation: 3,
+        margin: EdgeInsets.all(10),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: SizedBox(
@@ -50,7 +67,8 @@ class WeekDayWidget extends ConsumerWidget {
                             color: Theme.of(context)
                                 .colorScheme
                                 .onBackground
-                                .withOpacity(0.2),
+                                .withOpacity(0.5),
+                            fontWeight: FontWeight.bold,
                           ),
                     ),
                     const Spacer(),
@@ -67,14 +85,19 @@ class WeekDayWidget extends ConsumerWidget {
                   ],
                 ),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Text(
-                    content,
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onBackground
-                              .withOpacity(0.8),
-                        ),
+                  Expanded(
+                    child: Text(
+                      content,
+                      softWrap: true,
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onBackground
+                                .withOpacity(0.8),
+                            fontWeight: FontWeight.bold,
+                            fontSize: mealPlan[day] == null ? 9 : 15,
+                          ),
+                    ),
                   )
                 ]),
               ],

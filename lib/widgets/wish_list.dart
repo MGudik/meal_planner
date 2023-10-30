@@ -19,56 +19,71 @@ class WishList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.read(wishProvider.notifier).getWishList();
     final wishes = ref.watch(wishProvider);
-    return Container(
-      decoration: BoxDecoration(
-          border: Border.all(
-              color:
-                  Theme.of(context).colorScheme.onBackground.withOpacity(0.5)),
-          borderRadius: BorderRadius.circular(8),
-          color:
-              Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1)),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              const Spacer(),
-              Text(
-                "Wish List",
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const Spacer(),
-              InkWell(
-                onTap: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => AddWishScreen()));
-                },
-                child: Icon(
-                  Icons.add_box_rounded,
-                  size: 32,
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onBackground
-                      .withOpacity(0.5),
+    return Card(
+      elevation: 3,
+      margin: EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const Spacer(),
+                Text(
+                  "Wish List",
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                        fontSize: 24,
+                      ),
                 ),
-              )
-            ],
-          ),
-          Expanded(
-            child: ListView.builder(
+                const Spacer(),
+                InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => AddWishScreen()));
+                  },
+                  child: Icon(
+                    Icons.add_box_rounded,
+                    size: 32,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onBackground
+                        .withOpacity(0.5),
+                  ),
+                )
+              ],
+            ),
+            Divider(
+              color: Colors.white,
+            ),
+            Expanded(
+                child: ListView.builder(
               itemCount: wishes.length,
               itemBuilder: (context, index) {
                 return ListTile(
+                  title: Text(
+                    wishes[index].title,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  leading: Icon(
+                    Icons.star_rounded,
+                    color: Colors.white,
+                    size: 30.0,
+                  ),
                   onTap: () {
                     onTap(wishes[index]);
                     _removeWish(wishes[index], ref);
                   },
-                  title: Column(children: [Text(wishes[index].title), Text("Wished by " + wishes[index].wishedBy, style: Theme.of(context).textTheme.bodySmall!.copyWith(color: const Color.fromRGBO(255, 255, 255, 0.2)),) ]),
-                  leading: const Icon(Icons.star),
                 );
               },
-            ),
-          ),
-        ],
+            )),
+          ],
+        ),
       ),
     );
   }

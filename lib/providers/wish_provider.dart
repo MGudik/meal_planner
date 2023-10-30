@@ -17,6 +17,7 @@ class WishNotifier extends StateNotifier<List<Wish>> {
   }
 
   void getWishList() async {
+    print("WIsh");
     state = await http.getAllWishes();
   }
 }

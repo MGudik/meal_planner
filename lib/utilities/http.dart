@@ -70,7 +70,7 @@ Future<List<Wish>> getAllWishes() async {
   for (final entry in data.entries) {
     final title = entry.value["title"];
     final id = entry.key;
-    final wish = Wish(id: id, title: title);
+    final wish = Wish(id: id, title: title, wishedBy: "Gudiksen");
     newState.add(wish);
   }
   return newState;

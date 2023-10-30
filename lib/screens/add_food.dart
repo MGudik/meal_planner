@@ -16,57 +16,53 @@ class AddFoodScreen extends ConsumerWidget {
   void _selectWish(Wish wish, BuildContext context, WidgetRef ref) {
     titleController.text = wish.title;
     _addMeal(context, ref);
+    Navigator.pop(context);
   }
 
-  void _addMeal(BuildContext context, WidgetRef ref) async {
+  Future<bool> _addMeal(BuildContext context, WidgetRef ref) async {
     String enteredTitle = titleController.text.trim();
 
     if (enteredTitle.length <= 1) {
-      return;
+      http.removeDay(day);
+      ref.read(mealPlanProvider.notifier).removeMeal(day);
+      return true;
     }
 
     http.updateDay(enteredTitle, day);
     final meal = Food(title: enteredTitle);
     ref.read(mealPlanProvider.notifier).setMeal(meal, day);
-    Navigator.of(context).pop();
+    return true;
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     titleController.text = meal == null ? "" : meal!.title;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Meal for ${day.toString()}'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Form(
-          child: Column(children: [
-            TextFormField(
-              decoration: const InputDecoration(labelText: "Meal Title"),
-              controller: titleController,
-            ),
-            const SizedBox(
-              height: 16,
-            ),
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.onBackground,
-                foregroundColor: Theme.of(context).colorScheme.background,
+    return WillPopScope(
+      onWillPop: () async {
+        return _addMeal(context, ref);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Meal for ${day.toString()}'),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Form(
+            child: Column(children: [
+              TextFormField(
+                decoration: const InputDecoration(labelText: "Meal Title"),
+                controller: titleController,
               ),
-              onPressed: () => _addMeal(context, ref),
-              icon: const Icon(Icons.add),
-              label: const Text('Add Meal!'),
-            ),
-            const SizedBox(
-              height: 16,
-            ),
-            Expanded(child: WishList(
-              onTap: (Wish wish) {
-                _selectWish(wish, context, ref);
-              },
-            )),
-          ]),
+              const SizedBox(
+                height: 16,
+              ),
+              Expanded(child: WishList(
+                onTap: (Wish wish) {
+                  _selectWish(wish, context, ref);
+                },
+              )),
+            ]),
+          ),
         ),
       ),
     );
