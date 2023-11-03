@@ -1,46 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:meal_planner/models/food.dart';
 import 'package:meal_planner/models/week.dart';
-import 'package:meal_planner/providers/plan_provider.dart';
+import 'package:meal_planner/utilities/firebase.dart' as firebase;
 import 'package:meal_planner/widgets/wish_list.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:meal_planner/utilities/http.dart' as http;
 
-class AddFoodScreen extends ConsumerWidget {
+class AddFoodScreen extends StatelessWidget {
   AddFoodScreen({super.key, required this.day, required this.meal});
 
   final WeekDay day;
   final Food? meal;
   final titleController = TextEditingController();
 
-  void _selectWish(Wish wish, BuildContext context, WidgetRef ref) {
-    titleController.text = wish.title;
-    _addMeal(context, ref);
+  void _selectWish(Wish wish, BuildContext context) {
+    //titleController.text = wish.title;
+    //_addMeal(context, ref);
     Navigator.pop(context);
   }
 
-  Future<bool> _addMeal(BuildContext context, WidgetRef ref) async {
+  void _addMeal() {
     String enteredTitle = titleController.text.trim();
 
-    if (enteredTitle.length <= 1) {
-      http.removeDay(day);
-      ref.read(mealPlanProvider.notifier).removeMeal(day);
-      return true;
+    if (enteredTitle.length <= 2) {
+      firebase.clearDay(day);
     }
 
-    http.updateDay(enteredTitle, day);
-    final meal = Food(title: enteredTitle);
-    ref.read(mealPlanProvider.notifier).setMeal(meal, day);
-    return true;
+    firebase.updateDay(day, enteredTitle);
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     titleController.text = meal == null ? "" : meal!.title;
-    return WillPopScope(
-      onWillPop: () async {
-        return _addMeal(context, ref);
-      },
+    return PopScope(
+      onPopInvoked: (didPop) => _addMeal(),
       child: Scaffold(
         appBar: AppBar(
           title: Text('Meal for ${day.toString()}'),
@@ -58,7 +49,7 @@ class AddFoodScreen extends ConsumerWidget {
               ),
               Expanded(child: WishList(
                 onTap: (Wish wish) {
-                  _selectWish(wish, context, ref);
+                  _selectWish(wish, context);
                 },
               )),
             ]),

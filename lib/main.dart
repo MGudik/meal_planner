@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:meal_planner/screens/main_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:meal_planner/screens/auth.dart';
+import 'package:meal_planner/screens/meal_plan.dart';
+import 'package:meal_planner/screens/splash.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 final theme = ThemeData(
   useMaterial3: true,
@@ -12,8 +17,12 @@ final theme = ThemeData(
   textTheme: GoogleFonts.latoTextTheme().apply(bodyColor: Colors.white),
 );
 
-void main() {
-  runApp(const ProviderScope(child: App()));
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(App());
 }
 
 class App extends StatelessWidget {
@@ -21,6 +30,21 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(theme: theme, home: const MainScreen());
+    return MaterialApp(
+      theme: theme,
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (ctx, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SplashScreen();
+          }
+          if (snapshot.hasData) {
+            return const MealPlanScreen();
+          }
+
+          return const AuthScreen();
+        },
+      ),
+    );
   }
 }

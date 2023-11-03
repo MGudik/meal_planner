@@ -1,34 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meal_planner/models/food.dart';
-import 'package:meal_planner/providers/wish_provider.dart';
-import 'package:meal_planner/utilities/http.dart' as http;
+import 'package:meal_planner/utilities/firebase.dart' as firebase;
 
-class AddWishScreen extends ConsumerWidget {
+class AddWishScreen extends StatelessWidget {
   AddWishScreen({super.key});
 
   final _titleController = TextEditingController();
 
-  void _makeWish(BuildContext context, WidgetRef ref) async {
+  void _makeWish(BuildContext context) {
     String enteredTitle = _titleController.text.trim();
 
     if (enteredTitle.length <= 1) {
       return;
     }
 
-    final response = await http.addWish(enteredTitle);
-    if (response != null) {
-      final wish =
-          Wish(id: response, title: enteredTitle, wishedBy: "Gudiksen");
-      ref.read(wishProvider.notifier).makeWish(wish);
-    }
+    firebase.addWish(enteredTitle);
+
     if (context.mounted) {
       Navigator.of(context).pop();
     }
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Wish a Meal'),
@@ -49,7 +43,7 @@ class AddWishScreen extends ConsumerWidget {
                 backgroundColor: Theme.of(context).colorScheme.onBackground,
                 foregroundColor: Theme.of(context).colorScheme.background,
               ),
-              onPressed: () => _makeWish(context, ref),
+              onPressed: () => _makeWish(context),
               icon: const Icon(Icons.star),
               label: const Text('Make a Wish!'),
             ),

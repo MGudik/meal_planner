@@ -2,50 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meal_planner/models/food.dart';
 import 'package:meal_planner/models/week.dart';
-import 'package:meal_planner/providers/plan_provider.dart';
-import 'package:meal_planner/utilities/http.dart' as http;
 import 'package:meal_planner/screens/add_food.dart';
+import 'package:meal_planner/utilities/firebase.dart' as firebase;
 
 class WeekDayWidget extends ConsumerWidget {
-  const WeekDayWidget({super.key, required this.day});
+  const WeekDayWidget({super.key, required this.meal, required this.day});
 
+  final Food? meal;
   final WeekDay day;
 
-  void _clearDay(WidgetRef ref) async {
-    http.removeDay(day);
-    ref.read(mealPlanProvider.notifier).removeMeal(day);
+  void _clearDay() async {
+    firebase.clearDay(day);
   }
 
   void _addFood(BuildContext context, Food? meal, WidgetRef ref) async {
-    final title = await Navigator.of(context).push(MaterialPageRoute<String>(
+    Navigator.of(context).push(MaterialPageRoute<String>(
       builder: (context) => AddFoodScreen(day: day, meal: meal),
     ));
-    if (title == null) {
-      return;
-    }
-    String enteredTitle = title.trim();
-
-    if (enteredTitle.length <= 1) {
-      return;
-    }
-
-    http.updateDay(enteredTitle, day);
-    final newMeal = Food(title: enteredTitle);
-    ref.read(mealPlanProvider.notifier).setMeal(newMeal, day);
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mealPlan = ref.watch(mealPlanProvider);
     String content;
-    if (mealPlan[day] == null) {
+    if (meal == null) {
       content = "Click to add a meal...";
     } else {
-      content = mealPlan[day]!.title;
+      content = meal!.title;
     }
 
     return InkWell(
-      onTap: () => _addFood(context, mealPlan[day], ref),
+      onTap: () => _addFood(context, meal, ref),
       child: Card(
         elevation: 3,
         margin: EdgeInsets.all(10),
@@ -72,10 +58,10 @@ class WeekDayWidget extends ConsumerWidget {
                           ),
                     ),
                     const Spacer(),
-                    mealPlan[day] == null
+                    meal == null
                         ? const Spacer()
                         : InkWell(
-                            onTap: () => _clearDay(ref),
+                            onTap: () => _clearDay(),
                             child: Icon(Icons.delete,
                                 color: Theme.of(context)
                                     .colorScheme
@@ -95,7 +81,7 @@ class WeekDayWidget extends ConsumerWidget {
                                 .onBackground
                                 .withOpacity(0.8),
                             fontWeight: FontWeight.bold,
-                            fontSize: mealPlan[day] == null ? 9 : 15,
+                            fontSize: meal == null ? 9 : 15,
                           ),
                     ),
                   )
