@@ -4,10 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:meal_planner/models/food.dart';
 import 'package:meal_planner/models/week.dart';
+import 'package:meal_planner/screens/user_screen.dart';
 import 'package:meal_planner/widgets/week_day.dart';
 
 class MealPlanScreen extends StatelessWidget {
   const MealPlanScreen({super.key});
+
+  void _openUserTab(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (ctx) => UserScreen(
+              onSignOut: () {
+                _signOutUser(context);
+              },
+            )));
+  }
+
+  void _signOutUser(BuildContext context) {
+    FirebaseAuth.instance.signOut();
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +57,10 @@ class MealPlanScreen extends StatelessWidget {
           centerTitle: true,
         ),
         floatingActionButton: FloatingActionButton.small(
-          child: const Icon(Icons.star),
-          onPressed: () {},
+          child: const Icon(Icons.account_circle),
+          onPressed: () {
+            _openUserTab(context);
+          },
         ),
         body: FutureBuilder(
           future: userStore,
@@ -75,7 +92,12 @@ class MealPlanScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         for (final (index, day) in WeekDay.values.indexed)
-                          WeekDayWidget(key: ValueKey(index), meal: loadedWeek.get(day.toString()) == null ? null : Food(title: loadedWeek.get(day.toString())), day: day)
+                          WeekDayWidget(
+                              key: ValueKey(index),
+                              meal: loadedWeek.get(day.toString()) == null
+                                  ? null
+                                  : Food(title: loadedWeek.get(day.toString())),
+                              day: day)
                       ],
                     ),
                   );

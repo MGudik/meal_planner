@@ -44,7 +44,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
         final mealPlanId = await firebase.createEmptyMealPlan();
 
-        FirebaseFirestore.instance
+        await FirebaseFirestore.instance
             .collection('users')
             .doc(userCredentials.user!.uid)
             .set({

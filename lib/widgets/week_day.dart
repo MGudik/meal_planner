@@ -4,6 +4,7 @@ import 'package:meal_planner/models/food.dart';
 import 'package:meal_planner/models/week.dart';
 import 'package:meal_planner/screens/add_food.dart';
 import 'package:meal_planner/utilities/firebase.dart' as firebase;
+import 'package:meal_planner/utilities/strings.dart';
 
 class WeekDayWidget extends ConsumerWidget {
   const WeekDayWidget({super.key, required this.meal, required this.day});
@@ -48,7 +49,7 @@ class WeekDayWidget extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      day.toString(),
+                      day.toString().toCapitalized(),
                       style: Theme.of(context).textTheme.bodySmall!.copyWith(
                             color: Theme.of(context)
                                 .colorScheme

@@ -12,8 +12,8 @@ class AddFoodScreen extends StatelessWidget {
   final titleController = TextEditingController();
 
   void _selectWish(Wish wish, BuildContext context) {
-    //titleController.text = wish.title;
-    //_addMeal(context, ref);
+    titleController.text = wish.title;
+    firebase.removeWish(wish);
     Navigator.pop(context);
   }
 
