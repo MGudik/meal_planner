@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:meal_planner/models/food.dart';
+import 'package:meal_planner/models/invitation.dart';
 import 'package:meal_planner/models/week.dart';
+import 'package:meal_planner/screens/meal_plan.dart';
 
 Future<String> createEmptyMealPlan() async {
   final response =
@@ -65,10 +67,63 @@ Future<List<Wish>> getWishList() async {
       .doc(mealPlanId)
       .get();
   final currentWishes = document.get('wishes') as List;
-  
+
   return currentWishes.asMap().entries.map((entry) {
     int idx = entry.key;
     String val = entry.value;
     return Wish(id: idx.toString(), title: val, wishedBy: "Gudiksen");
   }).toList();
+}
+
+void deleteInvitation(Invitation invitation) async {
+  final currentUser = FirebaseAuth.instance.currentUser!;
+  final userData = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser.uid)
+      .get();
+
+  final List invitations = userData.get('invitations');
+  final new_invitations = invitations.where((element) {
+    return !(element['invitedBy'] == invitation.invitedBy &&
+        element['planID'] == invitation.planID);
+  });
+  FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser.uid)
+      .update({'invitations': new_invitations});
+}
+
+Future<void> acceptInvitation(Invitation invitation) async {
+  final currentUser = FirebaseAuth.instance.currentUser!;
+  await FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser.uid)
+      .update({'mealId': invitation.planID});
+}
+
+void inviteUser(String email) async {
+  final currentUser = FirebaseAuth.instance.currentUser!;
+  final userData = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser.uid)
+      .get();
+  final username = userData.get('username');
+  final mealPlan = userData.get('mealId');
+  final documents = await FirebaseFirestore.instance
+      .collection('users')
+      .where('email', isEqualTo: email.toLowerCase())
+      .get()
+      .then((snapshot) => snapshot.docs);
+
+  if (documents.length == 0) {
+    return;
+  }
+  final targetDoc = documents[0];
+  final List<dynamic> invitations = targetDoc.get('invitations');
+  FirebaseFirestore.instance.collection('users').doc(targetDoc.id).update({
+    'invitations': [
+      ...invitations,
+      {'invitedBy': username, 'planID': mealPlan}
+    ]
+  });
 }

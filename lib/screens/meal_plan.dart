@@ -27,33 +27,37 @@ class MealPlanScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authenticatedUser = FirebaseAuth.instance.currentUser!;
-    final userStore = FirebaseFirestore.instance
-        .collection('users')
-        .doc(authenticatedUser.uid)
-        .get();
     return Scaffold(
         appBar: AppBar(
-          title: Row(
-            children: [
-              Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-              ),
-              Spacer(),
-              Text(
-                "Weekly Meal Plan",
-                style: GoogleFonts.dancingScript(
-                  color: Colors.white,
-                  fontSize: 36,
+          title: true
+              ? Text(
+                  "Weekly Meal Plan",
+                  style: GoogleFonts.dancingScript(
+                    color: Colors.white,
+                    fontSize: 36,
+                  ),
+                )
+              : Row(
+                  children: [
+                    Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                    ),
+                    Spacer(),
+                    Text(
+                      "Weekly Meal Plan",
+                      style: GoogleFonts.dancingScript(
+                        color: Colors.white,
+                        fontSize: 36,
+                      ),
+                    ),
+                    Spacer(),
+                    Icon(
+                      Icons.arrow_forward,
+                      color: Colors.white,
+                    )
+                  ],
                 ),
-              ),
-              Spacer(),
-              Icon(
-                Icons.arrow_forward,
-                color: Colors.white,
-              )
-            ],
-          ),
           centerTitle: true,
         ),
         floatingActionButton: FloatingActionButton.small(
@@ -62,14 +66,19 @@ class MealPlanScreen extends StatelessWidget {
             _openUserTab(context);
           },
         ),
-        body: FutureBuilder(
-          future: userStore,
+        body: StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('users')
+              .doc(authenticatedUser.uid)
+              .snapshots(),
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
+            if (snapshot.connectionState == ConnectionState.waiting ||
+                !snapshot.hasData) {
               return Center(
                 child: CircularProgressIndicator(),
               );
             }
+
             final mealPlanID = snapshot.data!.get('mealId');
             return StreamBuilder(
                 stream: FirebaseFirestore.instance

@@ -37,10 +37,10 @@ class _AuthScreenState extends State<AuthScreen> {
       });
       if (_isLogin) {
         await _firebase.signInWithEmailAndPassword(
-            email: _enteredEmail, password: _enteredPassword);
+            email: _enteredEmail.toLowerCase(), password: _enteredPassword);
       } else {
         final userCredentials = await _firebase.createUserWithEmailAndPassword(
-            email: _enteredEmail, password: _enteredPassword);
+            email: _enteredEmail.toLowerCase(), password: _enteredPassword);
 
         final mealPlanId = await firebase.createEmptyMealPlan();
 
@@ -48,9 +48,10 @@ class _AuthScreenState extends State<AuthScreen> {
             .collection('users')
             .doc(userCredentials.user!.uid)
             .set({
-          'email': _enteredEmail,
+          'email': _enteredEmail.toLowerCase(),
           'username': _enteredFirstName,
-          'mealId': mealPlanId
+          'mealId': mealPlanId,
+          'invitations': []
         });
       }
     } on FirebaseAuthException catch (error) {
@@ -63,9 +64,6 @@ class _AuthScreenState extends State<AuthScreen> {
             SnackBar(content: Text(error.message ?? 'Authentication failed')));
       }
     }
-    setState(() {
-      _isAuthenticating = false;
-    });
   }
 
   @override
@@ -77,6 +75,15 @@ class _AuthScreenState extends State<AuthScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Image.asset(
+                'assets/images/logo.png',
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                width: 200,
+                height: 200,
+              ),
+              const SizedBox(
+                height: 16,
+              ),
               Card(
                 margin: const EdgeInsets.all(20),
                 child: SingleChildScrollView(

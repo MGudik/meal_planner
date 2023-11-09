@@ -1,5 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:meal_planner/widgets/invitation_list.dart';
+import 'package:meal_planner/widgets/invite_user.dart';
 
 class UserScreen extends StatelessWidget {
   const UserScreen({super.key, required this.onSignOut});
@@ -9,11 +10,16 @@ class UserScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("User Settings"),
+      ),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ElevatedButton(onPressed: onSignOut, child: Text('Sign out'))
+            InvitationList(),
+            InviteUserWidget(),
+            ElevatedButton(onPressed: onSignOut, child: Text('Sign out')),
           ],
         ),
       ),
