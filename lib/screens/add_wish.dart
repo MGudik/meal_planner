@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:meal_planner/models/food.dart';
 import 'package:meal_planner/utilities/firebase.dart' as firebase;
+import 'package:meal_planner/utilities/snackbars.dart';
+import 'package:meal_planner/widgets/wish_list.dart';
 
 class AddWishScreen extends StatelessWidget {
   AddWishScreen({super.key});
@@ -15,17 +17,21 @@ class AddWishScreen extends StatelessWidget {
     }
 
     firebase.addWish(enteredTitle);
-
-    if (context.mounted) {
-      Navigator.of(context).pop();
-    }
+    
+    if (context.mounted) FocusScope.of(context).unfocus();
+    _titleController.clear();
+    printSnackBar(context, "You added a wish!");
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Wish a Meal'),
+        title: Text(
+          'Wish a Meal',
+          style: Theme.of(context).textTheme.titleLarge!.copyWith(fontSize: 32),
+        ),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -49,7 +55,12 @@ class AddWishScreen extends StatelessWidget {
             ),
             const SizedBox(
               height: 16,
-            )
+            ),
+            Expanded(
+                child: WishList(
+              onTap: (Wish wish) {},
+              doDelete: false,
+            ))
           ]),
         ),
       ),

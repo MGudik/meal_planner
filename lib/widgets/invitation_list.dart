@@ -12,8 +12,12 @@ class InvitationList extends StatelessWidget {
     final currentUser = FirebaseAuth.instance.currentUser;
     return Expanded(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Invitations', style: Theme.of(context).textTheme.titleLarge,),
+          Text(
+            'Invitations',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           Divider(),
           StreamBuilder(
               stream: FirebaseFirestore.instance
@@ -25,23 +29,26 @@ class InvitationList extends StatelessWidget {
                     !snapshot.hasData) {
                   return CircularProgressIndicator();
                 }
-      
+
                 final data = snapshot.data!;
                 List<dynamic> invitations = data.get('invitations');
+                if (invitations.isEmpty) {
+                  return Text("You have no invitations yet.");
+                }
                 List<Invitation> invitationItems = invitations
                     .map((e) => Invitation(
                         planID: e['planID']!, invitedBy: e['invitedBy']!))
                     .toList();
-      
-                return Expanded(
-                  child: ListView(
-                    children: invitationItems.isEmpty
-                        ? []
-                        : invitationItems
-                            .map((e) => InvitationItem(invitation: e))
-                            .toList(),
-                  ),
-                );
+
+                return SizedBox(
+                    height: 64,
+                    child: ListView(
+                      children: invitationItems.isEmpty
+                          ? []
+                          : invitationItems
+                              .map((e) => InvitationItem(invitation: e))
+                              .toList(),
+                    ));
               }),
         ],
       ),

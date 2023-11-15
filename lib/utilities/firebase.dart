@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:meal_planner/models/food.dart';
 import 'package:meal_planner/models/invitation.dart';
 import 'package:meal_planner/models/week.dart';
-import 'package:meal_planner/screens/meal_plan.dart';
 
 Future<String> createEmptyMealPlan() async {
   final response =
@@ -33,14 +32,15 @@ void clearDay(WeekDay day) async {
   updateDay(day, null);
 }
 
-Future<String?> addWish(String wish) async {
+Future<void> addWish(String wish) async {
   final mealPlanId = await getMealPlanId();
+  final username = await getUsername();
   final document = await FirebaseFirestore.instance
       .collection('mealplans')
       .doc(mealPlanId)
       .get();
   final currentWishes = document.get('wishes') as List;
-  currentWishes.add(wish);
+  currentWishes.add({'title': wish, 'wishedBy': username});
 
   FirebaseFirestore.instance
       .collection('mealplans')
@@ -48,7 +48,18 @@ Future<String?> addWish(String wish) async {
       .update({'wishes': currentWishes});
 }
 
-void removeWish(Wish wish) {}
+void removeWish(Wish wish) async {
+  final mealPlanId = await getMealPlanId();
+  final document = await FirebaseFirestore.instance
+      .collection('mealplans')
+      .doc(mealPlanId)
+      .get();
+  final currentWishes = document.get('wishes') as List;
+  currentWishes.removeAt(int.parse(wish.id));
+  FirebaseFirestore.instance.collection('mealplans').doc(mealPlanId).update({
+    'wishes': currentWishes,
+  });
+}
 
 Future<String> getMealPlanId() async {
   final authenticatedUser = FirebaseAuth.instance.currentUser!;
@@ -58,6 +69,16 @@ Future<String> getMealPlanId() async {
       .get();
   final mealPlanId = userStore.get('mealId');
   return mealPlanId;
+}
+
+Future<String> getUsername() async {
+  final authenticatedUser = FirebaseAuth.instance.currentUser!;
+  final userStore = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(authenticatedUser.uid)
+      .get();
+  final username = userStore.get('username');
+  return username;
 }
 
 Future<List<Wish>> getWishList() async {
@@ -70,8 +91,9 @@ Future<List<Wish>> getWishList() async {
 
   return currentWishes.asMap().entries.map((entry) {
     int idx = entry.key;
-    String val = entry.value;
-    return Wish(id: idx.toString(), title: val, wishedBy: "Gudiksen");
+    Map<String, dynamic> val = entry.value;
+    return Wish(
+        id: idx.toString(), title: val['title'], wishedBy: val['wishedBy']);
   }).toList();
 }
 
@@ -107,6 +129,9 @@ void inviteUser(String email) async {
       .collection('users')
       .doc(currentUser.uid)
       .get();
+  if (email.toLowerCase() == userData.get('email')) {
+    return;
+  }
   final username = userData.get('username');
   final mealPlan = userData.get('mealId');
   final documents = await FirebaseFirestore.instance
@@ -120,6 +145,18 @@ void inviteUser(String email) async {
   }
   final targetDoc = documents[0];
   final List<dynamic> invitations = targetDoc.get('invitations');
+  final planAlreadyExists = invitations.where((element) {
+        if (element['planID'] == mealPlan) {
+          return true;
+        } else {
+          return false;
+        }
+      }).length >
+      0;
+  if (planAlreadyExists) {
+    return;
+  }
+
   FirebaseFirestore.instance.collection('users').doc(targetDoc.id).update({
     'invitations': [
       ...invitations,

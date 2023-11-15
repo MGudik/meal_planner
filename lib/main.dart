@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:meal_planner/screens/auth.dart';
-import 'package:meal_planner/screens/meal_plan.dart';
+import 'package:meal_planner/screens/main_screen.dart';
 import 'package:meal_planner/screens/splash.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -38,7 +38,7 @@ class App extends StatelessWidget {
             return const SplashScreen();
           }
           if (snapshot.hasData) {
-            return const MealPlanScreen();
+            return const MainScreen();
           }
 
           return const AuthScreen();

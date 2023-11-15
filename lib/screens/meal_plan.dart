@@ -4,67 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:meal_planner/models/food.dart';
 import 'package:meal_planner/models/week.dart';
-import 'package:meal_planner/screens/user_screen.dart';
 import 'package:meal_planner/widgets/week_day.dart';
 
 class MealPlanScreen extends StatelessWidget {
   const MealPlanScreen({super.key});
-
-  void _openUserTab(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (ctx) => UserScreen(
-              onSignOut: () {
-                _signOutUser(context);
-              },
-            )));
-  }
-
-  void _signOutUser(BuildContext context) {
-    FirebaseAuth.instance.signOut();
-    Navigator.pop(context);
-  }
 
   @override
   Widget build(BuildContext context) {
     final authenticatedUser = FirebaseAuth.instance.currentUser!;
     return Scaffold(
         appBar: AppBar(
-          title: true
-              ? Text(
-                  "Weekly Meal Plan",
-                  style: GoogleFonts.dancingScript(
-                    color: Colors.white,
-                    fontSize: 36,
-                  ),
-                )
-              : Row(
-                  children: [
-                    Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                    ),
-                    Spacer(),
-                    Text(
-                      "Weekly Meal Plan",
-                      style: GoogleFonts.dancingScript(
-                        color: Colors.white,
-                        fontSize: 36,
-                      ),
-                    ),
-                    Spacer(),
-                    Icon(
-                      Icons.arrow_forward,
-                      color: Colors.white,
-                    )
-                  ],
-                ),
+          title: Text(
+            "Weekly Meal Plan",
+            style: GoogleFonts.dancingScript(
+              color: Colors.white,
+              fontSize: 36,
+            ),
+          ),
           centerTitle: true,
-        ),
-        floatingActionButton: FloatingActionButton.small(
-          child: const Icon(Icons.account_circle),
-          onPressed: () {
-            _openUserTab(context);
-          },
         ),
         body: StreamBuilder(
           stream: FirebaseFirestore.instance

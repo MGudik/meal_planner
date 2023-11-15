@@ -22,6 +22,7 @@ class AddFoodScreen extends StatelessWidget {
 
     if (enteredTitle.length <= 2) {
       firebase.clearDay(day);
+      return;
     }
 
     firebase.updateDay(day, enteredTitle);
@@ -47,10 +48,12 @@ class AddFoodScreen extends StatelessWidget {
               const SizedBox(
                 height: 16,
               ),
-              Expanded(child: WishList(
+              Expanded(
+                  child: WishList(
                 onTap: (Wish wish) {
                   _selectWish(wish, context);
                 },
+                doDelete: true,
               )),
             ]),
           ),

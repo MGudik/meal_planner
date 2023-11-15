@@ -1,8 +1,8 @@
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:meal_planner/utilities/firebase.dart' as firebase;
+import 'package:meal_planner/utilities/snackbars.dart';
 
 final _firebase = FirebaseAuth.instance;
 
@@ -56,13 +56,16 @@ class _AuthScreenState extends State<AuthScreen> {
       }
     } on FirebaseAuthException catch (error) {
       if (error.code == 'email-already-in-use') {
-        //...
+        printSnackBar(context, "An user with that email does already exists!");
       }
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(error.message ?? 'Authentication failed')));
+      else if (error.code == 'invalid-login-credentials') {
+        printSnackBar(context, "Provided information did not match!");
+      } else {
+        printSnackBar(context, error.message ?? 'Authentication failed');
       }
+      setState(() {
+        _isAuthenticating = false;
+      });
     }
   }
 
