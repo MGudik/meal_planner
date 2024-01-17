@@ -18,6 +18,7 @@ class _BotNavBarState extends State<BotNavBar> {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       currentIndex: _selectedIndex,
+      type: BottomNavigationBarType.fixed,
       onTap: (newIndex) {
         setState(() {
           _selectedIndex = newIndex;
@@ -32,6 +33,14 @@ class _BotNavBarState extends State<BotNavBar> {
         BottomNavigationBarItem(
           icon: Icon(Icons.star),
           label: "Wishes",
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.checklist),
+          label: "Todo",
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.shopping_cart_outlined),
+          label: "Shopping List",
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.account_circle),

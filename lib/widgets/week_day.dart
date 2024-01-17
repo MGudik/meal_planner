@@ -7,10 +7,15 @@ import 'package:meal_planner/utilities/firebase.dart' as firebase;
 import 'package:meal_planner/utilities/strings.dart';
 
 class WeekDayWidget extends ConsumerWidget {
-  const WeekDayWidget({super.key, required this.meal, required this.day});
+  const WeekDayWidget(
+      {super.key,
+      required this.meal,
+      required this.day,
+      required this.isCurrentDay});
 
   final Food? meal;
   final WeekDay day;
+  final bool isCurrentDay;
 
   void _clearDay() async {
     firebase.clearDay(day);
@@ -24,6 +29,7 @@ class WeekDayWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final height = MediaQuery.of(context).size.height - (20 * 7) - (16 * 7);
     String content;
     if (meal == null) {
       content = "Click to add a meal...";
@@ -39,10 +45,13 @@ class WeekDayWidget extends ConsumerWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15.0),
         ),
+        color: isCurrentDay
+            ? Colors.blue.withOpacity(0.1)
+            : null, // Highlight color
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: SizedBox(
-            height: 72,
+            height: height / 8,
             child: Column(
               children: [
                 Row(

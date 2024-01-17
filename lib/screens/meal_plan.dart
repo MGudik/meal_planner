@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:meal_planner/models/food.dart';
 import 'package:meal_planner/models/week.dart';
+import 'package:meal_planner/widgets/settings_drawer.dart';
 import 'package:meal_planner/widgets/week_day.dart';
 
 class MealPlanScreen extends StatelessWidget {
@@ -12,7 +13,10 @@ class MealPlanScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authenticatedUser = FirebaseAuth.instance.currentUser!;
+    DateTime date = DateTime.now();
+    final today = date.weekday;
     return Scaffold(
+        drawer: SettingsDrawer(),
         appBar: AppBar(
           title: Text(
             "Weekly Meal Plan",
@@ -63,7 +67,8 @@ class MealPlanScreen extends StatelessWidget {
                               meal: loadedWeek.get(day.toString()) == null
                                   ? null
                                   : Food(title: loadedWeek.get(day.toString())),
-                              day: day)
+                              day: day,
+                              isCurrentDay: today == index + 1,)
                       ],
                     ),
                   );

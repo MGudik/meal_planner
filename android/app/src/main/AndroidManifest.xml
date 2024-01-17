@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
  <uses-permission android:name="android.permission.INTERNET" />   <!-- Add this line -->
     <application
-        android:label="Meal Plan"
+        android:label="Weekly Meal Planner"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

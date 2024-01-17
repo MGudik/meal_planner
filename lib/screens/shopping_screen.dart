@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:meal_planner/models/food.dart';
 import 'package:meal_planner/utilities/firebase.dart' as firebase;
 import 'package:flutter/material.dart';
+import 'package:meal_planner/models/todos.dart';
 import 'package:meal_planner/widgets/addItem.dart';
 
-class WishScreen extends StatelessWidget {
-  const WishScreen({super.key});
+class ShoppingScreen extends StatelessWidget {
+  const ShoppingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -43,52 +43,49 @@ class WishScreen extends StatelessWidget {
                             }
 
                             final List<dynamic> wishList =
-                                docSnap.data!.get('wishes') as List;
-                            final wishes =
+                                docSnap.data!.get('shopping') as List;
+                            final shoppingList =
                                 wishList.asMap().entries.map((entry) {
                               int idx = entry.key;
                               Map<String, dynamic> val = entry.value;
-                              return Wish(
-                                  id: idx.toString(),
-                                  title: val['title'],
-                                  wishedBy: val['wishedBy']);
+                              final todo = Todo.withID(
+                                  id: idx.toString(), title: val['title']);
+                              todo.setCompleation(val['compleated']);
+                              return todo;
                             }).toList();
+                            shoppingList.sort((a, b) => a.compleated ? 1 : -1);
                             return ListView.builder(
-                              itemCount: wishes.length,
+                              itemCount: shoppingList.length,
                               itemBuilder: (context, index) {
                                 return ListTile(
-                                  key: ValueKey(wishes[index].id),
-                                  title: Text(wishes[index].title,
+                                  title: Text(
+                                      key: ValueKey(shoppingList[index].id),
+                                      shoppingList[index].title,
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 12.0,
                                         fontWeight: FontWeight.bold,
                                       )),
-                                  subtitle: Text(
-                                      'Wished by: ${wishes[index].wishedBy}',
-                                      style: TextStyle(
-                                        fontSize: 9.0,
-                                      )),
-                                  trailing: InkWell(
+                                  leading: InkWell(
                                     child: Icon(
-                                      Icons.delete,
+                                      shoppingList[index].compleated
+                                          ? Icons.check_box_outlined
+                                          : Icons.check_box_outline_blank,
                                       color: Colors.white,
                                       size: 24.0,
                                     ),
-                                    onTap: () =>
-                                        firebase.removeWish(wishes[index]),
-                                  ),
-                                  leading: Icon(
-                                    Icons.star,
-                                    color: Colors.white,
-                                    size: 24.0,
+                                    onTap: () {
+                                      firebase.toggleShoppingCompleation(
+                                          shoppingList[index]);
+                                    },
                                   ),
                                 );
                               },
                             );
                           })),
                   NewItemWidget(
-                    onAdd: (String title) => firebase.addWish(title),
+                    onAdd: (String title) => firebase.addShoppingItem(title),
+                    onDelete: firebase.removeCheckedShoppingItems,
                   ),
                 ],
               ),

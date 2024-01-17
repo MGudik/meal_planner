@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:meal_planner/models/food.dart';
 import 'package:meal_planner/models/invitation.dart';
+import 'package:meal_planner/models/todos.dart';
 import 'package:meal_planner/models/week.dart';
 
 Future<String> createEmptyMealPlan() async {
@@ -15,6 +16,8 @@ Future<String> createEmptyMealPlan() async {
     'saturday': null,
     'sunday': null,
     'wishes': [],
+    'shopping': [],
+    'todos': [],
   });
 
   return response.id;
@@ -162,5 +165,95 @@ void inviteUser(String email) async {
       ...invitations,
       {'invitedBy': username, 'planID': mealPlan}
     ]
+  });
+}
+
+Future<void> addTodo(String todo) async {
+  final mealPlanId = await getMealPlanId();
+  final document = await FirebaseFirestore.instance
+      .collection('mealplans')
+      .doc(mealPlanId)
+      .get();
+  final currentTodos = document.get('todos') as List;
+  currentTodos.add({'title': todo, 'compleated': false});
+
+  FirebaseFirestore.instance
+      .collection('mealplans')
+      .doc(mealPlanId)
+      .update({'todos': currentTodos});
+}
+
+void removeCheckedTodos() async {
+  final mealPlanId = await getMealPlanId();
+  final document = await FirebaseFirestore.instance
+      .collection('mealplans')
+      .doc(mealPlanId)
+      .get();
+  final currentTodos = document.get('todos') as List;
+  final newTodos =
+      currentTodos.where((element) => element['compleated'] == false);
+  FirebaseFirestore.instance.collection('mealplans').doc(mealPlanId).update({
+    'todos': newTodos,
+  });
+}
+
+void toggleTodoCompleation(Todo todo) async {
+  final mealPlanId = await getMealPlanId();
+  final document = await FirebaseFirestore.instance
+      .collection('mealplans')
+      .doc(mealPlanId)
+      .get();
+  final currentTodos = document.get('todos') as List;
+  currentTodos.removeAt(int.parse(todo.id));
+  todo.toggleCompleation();
+  currentTodos.insert(
+      int.parse(todo.id), {'title': todo.title, 'compleated': todo.compleated});
+  FirebaseFirestore.instance.collection('mealplans').doc(mealPlanId).update({
+    'todos': currentTodos,
+  });
+}
+
+Future<void> addShoppingItem(String item) async {
+  final mealPlanId = await getMealPlanId();
+  final document = await FirebaseFirestore.instance
+      .collection('mealplans')
+      .doc(mealPlanId)
+      .get();
+  final currentItems = document.get('shopping') as List;
+  currentItems.add({'title': item, 'compleated': false});
+
+  FirebaseFirestore.instance
+      .collection('mealplans')
+      .doc(mealPlanId)
+      .update({'shopping': currentItems});
+}
+
+void removeCheckedShoppingItems() async {
+  final mealPlanId = await getMealPlanId();
+  final document = await FirebaseFirestore.instance
+      .collection('mealplans')
+      .doc(mealPlanId)
+      .get();
+  final currentItems = document.get('shopping') as List;
+  final newItems =
+      currentItems.where((element) => element['compleated'] == false);
+  FirebaseFirestore.instance.collection('mealplans').doc(mealPlanId).update({
+    'shopping': newItems,
+  });
+}
+
+void toggleShoppingCompleation(Todo todo) async {
+  final mealPlanId = await getMealPlanId();
+  final document = await FirebaseFirestore.instance
+      .collection('mealplans')
+      .doc(mealPlanId)
+      .get();
+  final currentItems = document.get('shopping') as List;
+  currentItems.removeAt(int.parse(todo.id));
+  todo.toggleCompleation();
+  currentItems.insert(
+      int.parse(todo.id), {'title': todo.title, 'compleated': todo.compleated});
+  FirebaseFirestore.instance.collection('mealplans').doc(mealPlanId).update({
+    'shopping': currentItems,
   });
 }
